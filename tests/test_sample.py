@@ -1,3 +1,4 @@
+from __future__ import print_function, absolute_import
 import pytest
 
 import findspark
@@ -5,6 +6,7 @@ findspark.init()
 
 import pyspark.sql.functions as sf  # more import if needed here
 import my_package.my_file as mf
+import my_package.util as util
 
 from fixtures import spark_context, hive_context
 
@@ -21,3 +23,7 @@ def test_filter_str(hive_context):
     filtered = mf.filter_str(df, 'name', 'bar')
     row, = filtered.collect()
     assert row['name'] == 'foo'
+
+
+def test_get_schema():
+    assert ['name', 'age'] == util.get_schema()
