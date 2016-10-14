@@ -23,9 +23,13 @@ def filter_str(df, column, string):
     return df.filter(~(sf.regexp_extract(column, '({})'.format(string), 1) == string))
 
 
+def main(sc, hc):
+    df = mf.define_df(hive_context).coalesce(1)
+    filtered = mf.filter_str(df, 'name', 'bar')
+    
 
-def main():
+if __name__ == "__main__":
     sc = SparkContext()
     hc = HiveContext()
-
+    main(sc, hc)
 

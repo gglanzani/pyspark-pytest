@@ -8,9 +8,6 @@ import pyspark.sql.functions as sf  # more import if needed here
 import my_package.my_file as mf
 import my_package.util as util
 
-from fixtures import spark_context, hive_context
-
-pytestmark = pytest.mark.usefixtures("spark_context", "hive_context")
 
 def test_define_df(spark_context, hive_context):
     df = mf.define_df(hive_context).coalesce(1)

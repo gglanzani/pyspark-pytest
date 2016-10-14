@@ -10,14 +10,8 @@ from pyspark.sql import HiveContext
 
 APP_NAME = 'pytest-pyspark-tests'
 
-def cleanup(spark_context):
-    """
-    On exit, kill the context.
-    """
-    spark_context.stop()
 
-
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session", autouse=True)
 def spark_context(request):
     """Fixture to create the SparkContext.
 
@@ -31,11 +25,12 @@ def spark_context(request):
     conf = SparkConf().setAppName(APP_NAME)
     sc = SparkContext(conf=conf)
     sc.setLogLevel("ERROR")
-    request.addfinalizer(lambda: sc.stop())
-    return sc
+    # request.addfinalizer(lambda: sc.stop())
+    yield sc
+    sc.stop()
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session", autouse=True)
 def hive_context(spark_context, request):
     """
     Fixture to create the HiveContext.
@@ -46,6 +41,9 @@ def hive_context(spark_context, request):
     Returns:
     HiveContext
     """
-    shutil.rmtree('metastore_db')
-    request.addfinalizer(lambda: cleanup(spark_context))
-    return HiveContext(spark_context)
+    try:
+        shutil.rmtree('metastore_db')
+    except:
+        pass
+    # request.addfinalizer(lambda: spark_context.stop())
+    yield HiveContext(spark_context)
